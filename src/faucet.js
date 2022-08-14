@@ -14,6 +14,13 @@ const signerPrivateKey = '8dbeb43e76b53cecbd8868a058bb33b152af72526142eee0ea656b
 
 const getTransactions = async () => {
     console.log('Start fetching initiated transactions from Explorer Center')
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log(faucetApiUrl + '?status=initiated')
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
     let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
     console.log(`Fetched ${+response?.length}`)
     if(+response?.length === 0) console.log(`No transaction to execute... starting over in 2 seconds`)
