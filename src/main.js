@@ -1,7 +1,6 @@
 require('discord-reply');
 require('dotenv').config();
 const web3 = require('web3');
-const crypto = require('crypto');
 const utils = require('./utils');
 const redisStore = require('./redis');
 const Logger = require('./logger.js');

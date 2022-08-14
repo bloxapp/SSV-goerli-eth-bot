@@ -12,7 +12,7 @@ const faucetApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet/`;
 const signerOwnerAddress = '0x67Ce5c69260bd819B4e0AD13f4b873074D479811';
 const signerPrivateKey = '8dbeb43e76b53cecbd8868a058bb33b152af72526142eee0ea656b0bb0473f70';
 
-export const getTransactions = async () => {
+const getTransactions = async () => {
     console.log('Start fetching initiated transactions from Explorer Center')
     let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
     console.log(`Fetched ${+response?.length}`)
@@ -53,4 +53,8 @@ const updateExplorerTransaction = async (transactionId, ownerAddress, txHash, st
     if(status) data.status = status;
     if(txHash) data.tx_hash = txHash;
     return axios.put(faucetApiUrl + transactionId + "/", data);
+};
+
+module.exports = {
+    getTransactions,
 };
