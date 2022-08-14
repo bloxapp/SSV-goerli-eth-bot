@@ -22,7 +22,7 @@
     "web3": "^1.6.0"
   },
   "scripts": {
-    "start": "node src/main.js",
+    "start": "node src/main.js"
   },
   "description": "## Configuration",
   "bugs": {

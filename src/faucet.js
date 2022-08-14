@@ -52,5 +52,5 @@ const updateExplorerTransaction = async (transactionId, ownerAddress, txHash, st
     };
     if(status) data.status = status;
     if(txHash) data.tx_hash = txHash;
-    return await axios.put(faucetApiUrl + transactionId + "/", data)
+    return axios.put(faucetApiUrl + transactionId + "/", data);
 };
