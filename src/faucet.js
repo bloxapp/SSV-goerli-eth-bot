@@ -49,7 +49,9 @@ const getTransactions = async () => {
         }
         setTimeout(getTransactions, 2000);
     } catch (e) {
-     console.log(`[FAUCET][ERROR]: ${e.message}`);
+        console.log(`[FAUCET][ERROR]: ${e.message}`);
+        console.log(`[FAUCET][ERROR]: Start fetching again....`);
+        setTimeout(getTransactions, 2000);
     }
 }
 
