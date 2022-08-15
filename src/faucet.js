@@ -6,9 +6,9 @@ const jsonInterface = require('../src/abi.json');
 const { SSV_INFURA_HTTPS_ENDPOINT, SSV_EXPLORER_URL, SINGER_PRIVATE_KEY } = process.env;
 const web3 = new Web3(new Web3.providers.HttpProvider(SSV_INFURA_HTTPS_ENDPOINT));
 
-const contract = new Contract(jsonInterface, ssvContract);
 const faucetApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet/`;
 const ssvContract = '0x6471F70b932390f527c6403773D082A0Db8e8A9F';
+const contract = new Contract(jsonInterface, ssvContract);
 const signerOwnerAddress = '0x3f158913A59d5E9f81FA86faF9E9165E531E4A44';
 
 const getTransactions = async () => {
