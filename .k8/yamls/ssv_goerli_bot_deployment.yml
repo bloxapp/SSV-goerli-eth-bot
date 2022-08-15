@@ -39,10 +39,10 @@ spec:
                   key: singer_private_key
 
             - name: SSV_DISCORD_BOT_TOKEN
-                valueFrom:
-                  secretKeyRef:
-                    name: config-secrets
-                    key: ssv_discord_bot_token
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_discord_bot_token
 
             - name: SSV_SHEET_REPLY_CHANNEL
               valueFrom:
