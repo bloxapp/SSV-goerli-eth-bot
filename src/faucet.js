@@ -3,24 +3,16 @@ const Contract = require('web3-eth-contract');
 require('dotenv').config();
 const axios = require("axios");
 const jsonInterface = require('../src/abi.json');
-const { SSV_INFURA_HTTPS_ENDPOINT, SSV_EXPLORER_URL } = process.env;
+const { SSV_INFURA_HTTPS_ENDPOINT, SSV_EXPLORER_URL, SINGER_PRIVATE_KEY } = process.env;
 const web3 = new Web3(new Web3.providers.HttpProvider(SSV_INFURA_HTTPS_ENDPOINT));
 
 const ssvContract = '0x6471F70b932390f527c6403773D082A0Db8e8A9F';
 const contract = new Contract(jsonInterface, ssvContract);
 const faucetApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet/`;
 const signerOwnerAddress = '0x67Ce5c69260bd819B4e0AD13f4b873074D479811';
-const signerPrivateKey = '8dbeb43e76b53cecbd8868a058bb33b152af72526142eee0ea656b0bb0473f70';
 
 const getTransactions = async () => {
     console.log('Start fetching initiated transactions from Explorer Center')
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log(faucetApiUrl + '?status=initiated')
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
     let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
     console.log(`Fetched ${+response?.length}`)
     if(+response?.length === 0) console.log(`No transaction to execute... starting over in 2 seconds`)
@@ -39,7 +31,7 @@ const getTransactions = async () => {
             from: signerOwnerAddress,
             value: web3.utils.numberToHex(web3.utils.toWei('0', 'ether')),
         }
-        const signedTx = await web3.eth.accounts.signTransaction(transaction, signerPrivateKey);
+        const signedTx = await web3.eth.accounts.signTransaction(transaction, SINGER_PRIVATE_KEY);
         console.log(`Sending transaction for ${userTransaction.owner_address}`)
         await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
             .on('transactionHash', (txHash) => {

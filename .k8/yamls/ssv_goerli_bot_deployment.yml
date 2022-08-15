@@ -32,11 +32,17 @@ spec:
           image: REPLACE_DOCKER_REPO:REPLACE_IMAGETAG
           imagePullPolicy: Always
           env:
-            - name: SSV_DISCORD_BOT_TOKEN
+            - name: SINGER_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
                   name: config-secrets
-                  key: ssv_discord_bot_token
+                  key: singer_private_key
+
+            - name: SSV_DISCORD_BOT_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: config-secrets
+                    key: ssv_discord_bot_token
 
             - name: SSV_SHEET_REPLY_CHANNEL
               valueFrom:
