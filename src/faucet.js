@@ -1,5 +1,4 @@
 const Web3 = require("web3");
-const Contract = require('web3-eth-contract');
 require('dotenv').config();
 const axios = require("axios");
 const jsonInterface = require('../src/abi.json');
@@ -7,15 +6,19 @@ const { SSV_INFURA_HTTPS_ENDPOINT, SSV_EXPLORER_URL, SINGER_PRIVATE_KEY } = proc
 const web3 = new Web3(new Web3.providers.HttpProvider(SSV_INFURA_HTTPS_ENDPOINT));
 
 const faucetApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet/`;
+const faucetConfigApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet_config/`;
 const ssvContract = '0x6471F70b932390f527c6403773D082A0Db8e8A9F';
-const contract = new Contract(jsonInterface, ssvContract);
+const contract = new web3.eth.Contract(jsonInterface, ssvContract);
 const signerOwnerAddress = '0x3f158913A59d5E9f81FA86faF9E9165E531E4A44';
 
 const getTransactions = async () => {
     console.log('Start fetching initiated transactions from Explorer Center')
     try {
+        const faucetConfig = await getFaucetConfig();
+        const faucetBalance = await getBalance(contract, signerOwnerAddress);
         let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
-        console.log(`Fetched ${+response?.length}`)
+        const transactionsCapacity = Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length;
+        if(faucetConfig.transactions_capacity !== transactionsCapacity) await updateFaucetConfig(faucetConfig, transactionsCapacity)
         if(+response?.length === 0) console.log(`No transaction to execute... starting over in 2 seconds`)
         for (let index = 0; index < response.length; index++) {
             const userTransaction = response[index];
@@ -27,8 +30,8 @@ const getTransactions = async () => {
                 nonce,
                 chainID: 5,
                 gas: 1000000,
-                gasPrice: gasPrice,
                 to: ssvContract,
+                gasPrice: gasPrice,
                 from: signerOwnerAddress,
                 value: web3.utils.numberToHex(web3.utils.toWei('0', 'ether')),
             }
@@ -53,6 +56,20 @@ const getTransactions = async () => {
         console.log(`[FAUCET][ERROR]: Start fetching again....`);
         setTimeout(getTransactions, 2000);
     }
+}
+
+const getBalance = async (contract, walletAddress) => {
+    const result = await contract.methods.balanceOf(walletAddress).call();
+    return web3.utils.fromWei(result);
+}
+
+const getFaucetConfig = async () => {
+    let response = (await axios.get(faucetConfigApiUrl)).data;
+    return response[+response?.length - 1];
+}
+
+const updateFaucetConfig = async (config, transactionsCapacity) => {
+    (await axios.put(faucetConfigApiUrl + `${config.id}/`,{amount_to_transfer: config.amount_to_transfer,transactions_capacity: transactionsCapacity})).data;
 }
 
 const updateExplorerTransaction = async (transactionId, ownerAddress, txHash, status) => {

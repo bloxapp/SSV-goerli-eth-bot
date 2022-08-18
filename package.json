@@ -22,7 +22,8 @@
     "web3": "^1.6.0"
   },
   "scripts": {
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "faucet": "node src/faucet.js"
   },
   "description": "## Configuration",
   "bugs": {
