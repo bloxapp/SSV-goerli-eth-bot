@@ -24,13 +24,13 @@ const getTransactions = async () => {
             const userTransaction = response[index];
             const nonce = '0x' + (await web3.eth.getTransactionCount(signerOwnerAddress)).toString(16);
             const data = contract.methods.transfer(userTransaction.owner_address, web3.utils.toWei('10')).encodeABI();
-            const gasPrice = 990000000000;
+            const gasPrice = await getGasPrice();
             const transaction = {
                 data,
                 nonce,
                 chainID: 5,
-                gas: 1000000,
                 to: ssvContract,
+                gasLimit: 1000000,
                 gasPrice: gasPrice,
                 from: signerOwnerAddress,
                 value: web3.utils.numberToHex(web3.utils.toWei('0', 'ether')),
@@ -80,6 +80,10 @@ const updateExplorerTransaction = async (transactionId, ownerAddress, txHash, st
     if(txHash) data.tx_hash = txHash;
     return axios.put(faucetApiUrl + transactionId + "/", data);
 };
+
+const getGasPrice = async () => {
+    return await web3.eth.getGasPrice();
+}
 
 module.exports = {
     getTransactions,
