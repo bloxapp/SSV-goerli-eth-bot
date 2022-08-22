@@ -52,6 +52,7 @@ module.exports = {
             if (isNaN(lastGasPrice)){
                 return 990000000000
             }
+            return lastGasPrice;
         }
         catch (e) {
             return 990000000000
