@@ -45,9 +45,6 @@ module.exports = {
     getGasPrice: async () => {
         try{
             const url = `${SSV_GOERLI_API_URL}?module=gastracker&action=gasoracle&apikey=${process.env.SSV_ETHERSCAN_API_KEY}`
-            console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<url>>>>>>>>>>>>>>>>>>>>>>>>>>');
-            console.log(url);
-            console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<url>>>>>>>>>>>>>>>>>>>>>>>>>>');
             let lastGasPrice =  (await axios.get(url)).data.result.FastGasPrice
             if (isNaN(lastGasPrice)){
                 return 990000000000
