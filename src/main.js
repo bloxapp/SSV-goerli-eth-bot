@@ -140,5 +140,6 @@ async function getAmountOfValidatorsAllowed() {
     return Math.floor(addressBalance / 32 - itemsInQueue);
 }
 
+console.log('<<<<<<ssv-goerli-bot started>>>>>>');
 getTransactions();
 bot.login(process.env.SSV_DISCORD_BOT_TOKEN);
