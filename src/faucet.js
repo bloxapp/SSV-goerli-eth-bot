@@ -21,7 +21,7 @@ const getTransactions = async () => {
         for (let index = 0; index < response.length; index++) {
             const userTransaction = response[index];
             const nonce = '0x' + (await web3.eth.getTransactionCount(SIGNER_OWNER_ADDRESS)).toString(16);
-            const data = contract.methods.transfer(userTransaction.owner_address, web3.utils.toWei(faucetConfig?.amount_to_transfer)).encodeABI();
+            const data = contract.methods.transfer(userTransaction.owner_address, web3.utils.toWei(faucetConfig?.amount_to_transfer.toString())).encodeABI();
             const gasPrice = await getGasPrice();
             const transaction = {
                 data,
