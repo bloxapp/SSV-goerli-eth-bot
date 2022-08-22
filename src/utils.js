@@ -56,7 +56,7 @@ const sendGoerliEth = async (address, message, methodAbi, amount, nonce, latestG
         gas: 1000000,
         value: web3.utils.numberToHex(web3.utils.toWei(amount.toString(), 'ether')),
         data: methodAbi,
-        gasPrice: latestGasPrice,
+        gasPrice:  web3.utils.toWei(latestGasPrice,'gwei'),
         chainID: 5,
         nonce,
     }
