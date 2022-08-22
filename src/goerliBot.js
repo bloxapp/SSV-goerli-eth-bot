@@ -19,7 +19,7 @@ module.exports = {
         return false;
       }
       const nonce = await utils.getNonce();
-      const latestGasPrice = await getGasPrice();
+      const latestGasPrice = await utils.convertToWei(await getGasPrice());
       console.log('nonce: ' + nonce);
       console.log('latestGasPrice: ' + latestGasPrice);
       await utils.sendGoerliEth(address, message, hexData, 32, nonce, Number(latestGasPrice));

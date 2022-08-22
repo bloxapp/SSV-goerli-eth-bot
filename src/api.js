@@ -1,5 +1,4 @@
 const axios = require('axios');
-const utils = require('./utils');
 const config = require('./config/config');
 require('dotenv').config({path: '../.env'})
 const {  SSV_GOERLI_API_URL, SSV_EXPLORER_URL } = process.env;
@@ -50,8 +49,6 @@ module.exports = {
             if (isNaN(lastGasPrice)){
                 return 990000000000
             }
-
-            return await utils.convertToWei(lastGasPrice);
         }
         catch (e) {
             return 990000000000
