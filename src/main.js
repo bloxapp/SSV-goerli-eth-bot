@@ -1,7 +1,6 @@
 require('discord-reply');
 require('dotenv').config();
 const web3 = require('web3');
-const crypto = require('crypto');
 const utils = require('./utils');
 const redisStore = require('./redis');
 const Logger = require('./logger.js');
@@ -9,6 +8,7 @@ const Discord = require('discord.js');
 const config = require('./config/config');
 const { verify } = require('./api.js');
 const goerliBot = require('./goerliBot.js');
+const {getTransactions} = require('./faucet.js');
 const bot = require('./initializers/DiscordBot');
 const queueHandler = require('./queueHandler.js');
 const walletSwitcher = require("./initializers/WalletSwitcher");
@@ -140,4 +140,5 @@ async function getAmountOfValidatorsAllowed() {
     return Math.floor(addressBalance / 32 - itemsInQueue);
 }
 
+getTransactions();
 bot.login(process.env.SSV_DISCORD_BOT_TOKEN);

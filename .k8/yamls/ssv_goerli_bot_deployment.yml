@@ -32,6 +32,24 @@ spec:
           image: REPLACE_DOCKER_REPO:REPLACE_IMAGETAG
           imagePullPolicy: Always
           env:
+            - name: SINGER_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: singer_private_key
+
+            - name: SIGNER_OWNER_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: signer_owner_address
+
+            - name: SSV_CONTRACT_ADDRESS
+                valueFrom:
+                  secretKeyRef:
+                    name: config-secrets
+                    key: ssv_contract_address
+
             - name: SSV_DISCORD_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -177,7 +195,7 @@ spec:
                   key: ssv_redis_uri
 
             - name: SSV_EXPLORER_URL
-              value: http://explorer-center-api-svc.explorer:5000
+              value: "http://explorer-center-api-svc.explorer:5000"
 
       tolerations:
         - effect: NoSchedule
