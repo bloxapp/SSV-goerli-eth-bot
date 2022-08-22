@@ -195,7 +195,7 @@ spec:
                   key: ssv_redis_uri
 
             - name: SSV_EXPLORER_URL
-              value: "http://explorer-center-api-svc.explorer:5000"
+              value: "http://explorer-center-api-v2-svc.explorer:5000"
 
       tolerations:
         - effect: NoSchedule
