@@ -59,7 +59,7 @@ const config = {
             WRONG_HEX: (authorId) => { return `**Error** \n <@!${authorId}> Transaction failed, please try again.`},
             INVALID_NUMBER_OF_ARGUMENTS_HEX: '**Error**\nInvalid number of arguments. Please provide your `hex` **after** the `address`.',
             SOMETHING_WENT_WRONG_RECEIVER_ELIGIBLE: '**Error** \n Something went wrong while confirming your transaction please try again.',
-            FAUCET_DONT_HAVE_ETH: '"**Operation Unsuccessful** \n The Bot does not have enough Goerli ETH. Please again at a different time."',
+            FAUCET_DONT_HAVE_ETH: '"**Operation Unsuccessful** \n The Bot does not have enough Goerli ETH. Please try again at a different time."',
             CONTACT_THE_MODS: '**Error** \n Something went wrong. \n If this continues, please contact the mods of this bot by using command: \`!mod\`',
             REACHED_DAILY_GOERLI_ETH: (authorId) => {return `**Error!** <@!${authorId}> \n have reached your daily limit. \n To view the BOT guide use: https://discord.com/channels/936177490752319539/936275762942709800/938475017509957653`},
             INVALID_NUMBER_OF_ARGUMENTS_ADDRESS: (authorId) => {return `**Error** \n <@!${authorId}> Please make sure you used the command properly.\n To view the BOT guide use: https://discord.com/channels/936177490752319539/936275762942709800/938475017509957653`},
