@@ -23,7 +23,7 @@ const config = {
                     **4.** The new BOT will receive your command and deposit 32 goerli straight to your validator. Do not \n
                      expect to see 32 goeth in your wallet. \n\n\n
                       **BOT rules:** \n
-                      **1.** Each user is entitled to 1 deposit per 24 hours. \n
+                      **1.** Each user is entitled to 1 deposit per week. \n
                       **2.** Only the wallet registering the validator to the ssv.network is eligible to participate using the bot. \n
                       **3.** If you made a deposit before but failed to register the validator with the same wallet to the  \n
                       ssv.network the bot will not accept your request.\n
