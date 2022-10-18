@@ -10,14 +10,20 @@ const faucetConfigApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet_config/`;
 const contract = new web3.eth.Contract(jsonInterface, SSV_CONTRACT_ADDRESS);
 
 const getTransactions = async () => {
-    console.log('Start fetching initiated transactions from Explorer Center')
+    console.log('[FAUCET][INFO] Start fetching initiated transactions from Explorer Center')
     try {
         const faucetConfig = await getFaucetConfig();
+        console.log(`[FAUCET][INFO] faucet config: ${JSON.stringify(faucetConfig)}`);
         const faucetBalance = await getBalance(contract, SIGNER_OWNER_ADDRESS);
+        console.log(`[FAUCET][INFO] faucet balance: ${faucetBalance}`);
         let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
         const transactionsCapacity = Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length;
-        if(faucetConfig.transactions_capacity !== transactionsCapacity) await updateFaucetConfig(faucetConfig, transactionsCapacity)
-        if(+response?.length === 0) console.log(`No transaction to execute... starting over in 2 seconds`)
+        console.log(`[FAUCET][INFO] transactions capacity: ${transactionsCapacity}`);
+        if(faucetConfig.transactions_capacity !== transactionsCapacity) {
+            console.log(`[FAUCET][INFO] update faucet config: ${transactionsCapacity}`);
+            await updateFaucetConfig(faucetConfig, transactionsCapacity)
+        }
+        if(+response?.length === 0) console.log(`[FAUCET][INFO] No transaction to execute... starting over in 2 seconds`)
         for (let index = 0; index < response.length; index++) {
             const userTransaction = response[index];
             const nonce = '0x' + (await web3.eth.getTransactionCount(SIGNER_OWNER_ADDRESS)).toString(16);
@@ -34,17 +40,17 @@ const getTransactions = async () => {
                 value: web3.utils.numberToHex(web3.utils.toWei('0', 'ether')),
             }
             const signedTx = await web3.eth.accounts.signTransaction(transaction, SINGER_PRIVATE_KEY);
-            console.log(`Sending transaction for ${userTransaction.owner_address}`)
+            console.log(`[FAUCET][INFO] Sending transaction for ${userTransaction.owner_address}`)
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
                 .on('transactionHash', (txHash) => {
                     updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, txHash, 'pending')
                 })
                 .on('receipt', (receipt) => {
-                    console.log(`Transaction for ${userTransaction.owner_address} finished with success`)
+                    console.log(`[FAUCET][INFO] Transaction for ${userTransaction.owner_address} finished with success`)
                     updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'success')
                 })
                 .on('error', (error) => {
-                    console.log(`Transaction for ${userTransaction.owner_address} finished with failure ${error.message}`)
+                    console.log(`[FAUCET][INFO] Transaction for ${userTransaction.owner_address} finished with failure ${error.message}`)
                     updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'initiated')
                 })
         }
@@ -67,7 +73,7 @@ const getFaucetConfig = async () => {
 }
 
 const updateFaucetConfig = async (config, transactionsCapacity) => {
-    (await axios.put(faucetConfigApiUrl + `${config.id}/`,{amount_to_transfer: config.amount_to_transfer,transactions_capacity: transactionsCapacity})).data;
+    (await axios.put(faucetConfigApiUrl + `${config.id}/`,{amount_to_transfer: config.amount_to_transfer, transactions_capacity: transactionsCapacity})).data;
 }
 
 const updateExplorerTransaction = async (transactionId, ownerAddress, txHash, status) => {
