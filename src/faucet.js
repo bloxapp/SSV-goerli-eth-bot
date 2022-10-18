@@ -19,11 +19,11 @@ const getTransactions = async () => {
         let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
         const transactionsCapacity = Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length;
         console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
-        console.log(faucetBalance)
-        console.log(faucetConfig?.amount_to_transfer)
-        console.log(+response?.length)
-        console.log(Math.floor(faucetBalance / faucetConfig?.amount_to_transfer))
-        console.log(Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length)
+        console.log('1) ' + faucetBalance)
+        console.log('2) ' + faucetConfig?.amount_to_transfer)
+        console.log('3) ' + +response?.length)
+        console.log('4) ' + Math.floor(faucetBalance / faucetConfig?.amount_to_transfer))
+        console.log('5) ' + Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length)
         console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
         console.log(`[FAUCET][INFO] transactions capacity: ${transactionsCapacity}`);
         if(faucetConfig.transactions_capacity !== transactionsCapacity) {
