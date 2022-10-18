@@ -18,13 +18,6 @@ const getTransactions = async () => {
         console.log(`[FAUCET][INFO] faucet balance: ${faucetBalance}`);
         let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
         const transactionsCapacity = Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length;
-        console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
-        console.log('1) ' + faucetBalance)
-        console.log('2) ' + faucetConfig?.amount_to_transfer)
-        console.log('3) ' + +response?.length)
-        console.log('4) ' + Math.floor(faucetBalance / faucetConfig?.amount_to_transfer))
-        console.log('5) ' + Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length)
-        console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<here>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
         console.log(`[FAUCET][INFO] transactions capacity: ${transactionsCapacity}`);
         if(faucetConfig.transactions_capacity !== transactionsCapacity) {
             console.log(`[FAUCET][INFO] update faucet config: ${transactionsCapacity}`);
@@ -58,7 +51,7 @@ const getTransactions = async () => {
                 })
                 .on('error', (error) => {
                     console.log(`[FAUCET][INFO] Transaction for ${userTransaction.owner_address} finished with failure ${error.message}`)
-                    updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'initiated')
+                    updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'failed')
                 })
         }
         setTimeout(getTransactions, 2000);
