@@ -26,6 +26,10 @@ const getTransactions = async () => {
         if(+response?.length === 0) console.log(`[FAUCET][INFO] No transaction to execute... starting over in 2 seconds`)
         for (let index = 0; index < response.length; index++) {
             const userTransaction = response[index];
+            if(!web3.utils.isAddress(userTransaction.owner_address)) {
+                await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'failed')
+                continue;
+            }
             const nonce = '0x' + (await web3.eth.getTransactionCount(SIGNER_OWNER_ADDRESS)).toString(16);
             const data = contract.methods.transfer(userTransaction.owner_address, web3.utils.toWei(faucetConfig?.amount_to_transfer.toString())).encodeABI();
             const gasPrice = await getGasPrice();
