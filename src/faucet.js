@@ -27,7 +27,7 @@ const getTransactions = async () => {
         for (let index = 0; index < response.length; index++) {
             const userTransaction = response[index];
             if(!web3.utils.isAddress(userTransaction.owner_address)) {
-                await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'failed')
+                await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, 'wrong owner_address', 'success')
                 continue;
             }
             const nonce = '0x' + (await web3.eth.getTransactionCount(SIGNER_OWNER_ADDRESS)).toString(16);
