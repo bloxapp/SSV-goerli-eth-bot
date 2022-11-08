@@ -37,6 +37,7 @@ const getTransactions = async () => {
                 data,
                 nonce,
                 chainID: 5,
+                gasLimit: 1000000,
                 gasPrice: gasPrice,
                 to: SSV_CONTRACT_ADDRESS,
                 from: SIGNER_OWNER_ADDRESS,

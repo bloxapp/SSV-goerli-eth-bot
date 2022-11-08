@@ -53,6 +53,7 @@ const sendGoerliEth = async (address, message, methodAbi, amount, nonce, latestG
     const transaction = {
         nonce,
         chainID: 5,
+        gas: 1000000,
         data: methodAbi,
         from: walletSwitcher.getWalletAddress(),
         to: '0xff50ed3d0ec03ac01d4c79aad74928bff48a7b2b',
