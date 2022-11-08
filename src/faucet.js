@@ -55,7 +55,7 @@ const getTransactions = async () => {
                 })
                 .on('error', (error) => {
                     console.log(`[FAUCET][INFO] Transaction for ${userTransaction.owner_address} finished with failure ${error.message}`)
-                    updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'failed')
+                    updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'success')
                 })
         }
         setTimeout(getTransactions, 2000);
