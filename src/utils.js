@@ -25,7 +25,7 @@ const convertToWei = async (amount) => {
 
 // Eth
 const getAddressTransactionCount = async (address) => {
-    return await web3.eth.getTransactionCount(address);
+    return await web3.eth.getTransactionCount(address, 'pending');
 }
 
 const getAddressBalance = async (address) => {
