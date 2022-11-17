@@ -69,6 +69,7 @@ const config = {
         SUCCESS: {
             PROCESSING_TRANSACTION: (authorId) => {return `**Success!** \n <@!${authorId}> \n Your request was added to the queue.\n You will be mentioned by the BOT if and when the deposit was made to your validator.`},
             OPERATION_SUCCESSFUL: (authorId, txHash) => {return `**Deposit Sent!** \n Deposited 32 goerli ETH for \n <@!${authorId}> validator.\n You will not see Goerli in your wallet. As it is deposited straight to your validator.\n View the transaction on etherscan: https://goerli.etherscan.io/tx/${txHash}`},
+            OPERATION_DIDNT_FINISH: (authorId) => {return `**Deposit Sent!** \n Deposited 32 goerli ETH for \n <@!${authorId}> validator.\n You will not see Goerli in your wallet. As it is deposited straight to your validator.\n Transaction was not mined yet`},
         },
     },
 };

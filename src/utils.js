@@ -79,6 +79,9 @@ const sendGoerliEth = async (address, message, methodAbi, amount, nonce, latestG
             console.log('<<<<<<<<<<<<<<<<<<<<<<<<<calculate new nonce>>>>>>>>>>>>>>>>>>>>>>>>>');
             const newNone = await getNonce();
             await sendGoerliEth(address, message, methodAbi, amount, newNone, latestGasPrice);
+        } else if (err.message.includes('Transaction was not mined within 750 seconds')) {
+            const channel = bot.channels.cache.find(channel => channel.id === config.CHANNEL_ID)
+            channel.send(config.MESSAGES.SUCCESS.OPERATION_DIDNT_FINISH(message.authorId))
         } else {
             console.log('<<<<<<<<<<error>>>>>>>>>>');
             console.log(err.message);
