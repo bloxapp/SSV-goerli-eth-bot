@@ -69,8 +69,6 @@ Helm deploy on stage:
       --wait
       ssv-goerli-bot
       .k8/helm3/ssv-goerli-bot
-      --dry-run
-      --debug
   only:
     - stage
 
