@@ -1,0 +1,200 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ssv-goerli-bot
+  name: ssv-goerli-bot
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ssv-goerli-bot
+  template:
+    metadata:
+      labels:
+        app: ssv-goerli-bot
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SINGER_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: singer_private_key
+
+            - name: SIGNER_OWNER_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: signer_owner_address
+
+            - name: SSV_CONTRACT_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_contract_address
+
+            - name: SSV_DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_discord_bot_token
+
+            - name: SSV_SHEET_REPLY_CHANNEL
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_sheet_reply_channel
+
+            - name: SSV_FORM_URL
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_form_url
+
+            - name: SSV_DISCORD_BOT_CHANNEL
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_discord_bot_channel
+
+            - name: SSV_FAUCET_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_faucet_address
+
+            - name: SSV_CONTRACT_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_contract_address
+
+            - name: SSV_FAUCET_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_faucet_private_key
+
+            - name: SSV_FAUCET_ADDRESS_2
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_faucet_address_2
+
+            - name: SSV_FAUCET_PRIVATE_KEY_2
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_faucet_private_key_2
+
+            - name: SSV_INFURA_HTTPS_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_infura_https_endpoint
+
+            - name: SSV_ETHERSCAN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_etherscan_api_key
+
+            - name: SSV_ETHERSCAN_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_etherscan_api_url
+
+            - name: SSV_GOERLI_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_goerli_api_url
+
+            - name: SSV_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_db_port
+
+            - name: SSV_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_db_name
+
+            - name: SSV_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_db_username
+
+            - name: SSV_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_db_pass
+
+            - name: SSV_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_db_host
+
+            - name: SSV_DAILY_LIMIT
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_daily_limit
+
+            - name: SSV_WEEKLY_LIMIT
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_weekly_limit
+
+            - name: SSV_METHOD_ABI
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_method_abi
+
+            - name: SSV_DEPOSIT_AMOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_deposit_amount
+
+            - name: SSV_MAX_DEPOSIT_AMOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_max_deposit_amount
+
+            - name: SSV_REDIS_URI
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_redis_uri
+
+            - name: SSV_EXPLORER_URL
+              value: "http://explorer-center-api-v2-svc.explorer:5000" 
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
