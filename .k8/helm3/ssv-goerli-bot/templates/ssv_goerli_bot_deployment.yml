@@ -47,6 +47,12 @@ spec:
                   name: config-secrets
                   key: ssv_discord_bot_token
 
+            - name: SSV_NETWORKS
+              valueFrom:
+                secretKeyRef:
+                  name: config-secrets
+                  key: ssv_networks
+
             - name: SSV_SHEET_REPLY_CHANNEL
               valueFrom:
                 secretKeyRef:
