@@ -71,12 +71,6 @@ spec:
                   name: config-secrets
                   key: ssv_faucet_address
 
-            - name: SSV_CONTRACT_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  name: config-secrets
-                  key: ssv_contract_address
-
             - name: SSV_FAUCET_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
