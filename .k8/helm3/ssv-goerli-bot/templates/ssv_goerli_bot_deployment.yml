@@ -35,12 +35,6 @@ spec:
                   name: config-secrets
                   key: signer_owner_address
 
-            - name: SSV_CONTRACT_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  name: config-secrets
-                  key: ssv_contract_address
-
             - name: SSV_DISCORD_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
