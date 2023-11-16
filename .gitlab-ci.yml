@@ -23,6 +23,7 @@ variables:
 
 
 Build stage Docker image:
+  image: docker:20.10.23
   stage: build
   tags:
     - blox-infra-stage
@@ -60,6 +61,7 @@ Helm deploy on stage:
 #blox-infra-prod
 Build prod Docker image:
   stage: build
+  image: docker:20.10.23
   tags:
     - blox-infra-prod
   script:
