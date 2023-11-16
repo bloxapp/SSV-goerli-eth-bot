@@ -7,7 +7,7 @@ const {  SSV_EXPLORER_URL, SINGER_PRIVATE_KEY, SIGNER_OWNER_ADDRESS } = process.
 const faucetApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet/`;
 const faucetConfigApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet_config/`;
 
-const createWeb3 = (infura) => new Web3(new Web3.providers.HttpProvider(infura));
+const createWeb3 = (ethProvider) => new Web3(new Web3.providers.HttpProvider(ethProvider));
 
 const getTransactions = async () => {
     console.log('[FAUCET][INFO] Start fetching initiated transactions from Explorer Center')
