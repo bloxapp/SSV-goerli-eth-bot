@@ -5,11 +5,11 @@ const getContractToken = (network) => {
   return networks.find(data => data.networkId === network)
 }
 
-const PRATER = '5';
-const HOLESKY = '17000';
+const PRATER_CHAIN_ID = '5';
+const HOLESKY_CHAIN_ID = '17000';
 
 const NETWORK_ABI = {
-  [PRATER]: [
+  [PRATER_CHAIN_ID]: [
     {
       "anonymous": false,
       "inputs": [
@@ -389,7 +389,7 @@ const NETWORK_ABI = {
       "type": "function"
     }
   ],
-  [HOLESKY]: [
+  [HOLESKY_CHAIN_ID]: [
     {
       "inputs": [],
       "stateMutability": "nonpayable",

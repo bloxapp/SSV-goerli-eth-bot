@@ -19,13 +19,13 @@ const getTransactions = async () => {
             const networkData = getContractToken(network);
             const web3 = createWeb3(networkData.infura);
             const contract = new web3.eth.Contract(NETWORK_ABI[network], networkData.tokenAddress);
-            const faucetConfig = await getFaucetConfig();
+            const faucetConfig = await getFaucetConfig(network);
             console.log(`[FAUCET][INFO] faucet config: ${JSON.stringify(faucetConfig)}`);
             const faucetBalance = await getBalance(contract, SIGNER_OWNER_ADDRESS, web3);
             console.log(`[FAUCET][INFO] faucet balance: ${faucetBalance}`);
             const transactionsCapacity = Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - +response?.length;
             console.log(`[FAUCET][INFO] transactions capacity: ${transactionsCapacity}`);
-            if(faucetConfig.transactions_capacity !== transactionsCapacity) {
+            if(faucetConfig && faucetConfig.transactions_capacity !== transactionsCapacity) {
                 console.log(`[FAUCET][INFO] update faucet config: ${transactionsCapacity}`);
                 await updateFaucetConfig(faucetConfig, transactionsCapacity)
             }
@@ -75,9 +75,13 @@ const getBalance = async (contract, walletAddress, web3) => {
     return web3.utils.fromWei(result);
 }
 
-const getFaucetConfig = async () => {
-    let response = (await axios.get(faucetConfigApiUrl)).data;
-    return response[+response?.length - 1];
+const getFaucetConfig = async (network) => {
+    let response = (await axios.get(faucetConfigApiUrl)).data.filter(config => config.network === network);
+    if(response.length > 0) {
+        return response[+response?.length - 1];
+    } else {
+        return null;
+    }
 }
 
 const updateFaucetConfig = async (config, transactionsCapacity) => {
