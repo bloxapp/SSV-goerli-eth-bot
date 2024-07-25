@@ -54,10 +54,10 @@ Helm deploy on stage:
       --install
       --namespace api
       --set image.tag=$IMAGE_TAG
-      --values .k8/helm3/ssv-goerli-bot/stage-values.yaml
+      --values .k8/helm3/ssv-faucet-bot/stage-values.yaml
       --wait
-      ssv-goerli-bot
-      .k8/helm3/ssv-goerli-bot
+      ssv-faucet-bot
+      .k8/helm3/ssv-faucet-bot
   only:
     - stage
 
@@ -95,9 +95,9 @@ Helm deploy on production:
       --install
       --namespace api
       --set image.tag=$IMAGE_TAG
-      --values .k8/helm3/ssv-goerli-bot/prod-values.yaml
+      --values .k8/helm3/ssv-faucet-bot/prod-values.yaml
       --wait
-      ssv-goerli-bot
-      .k8/helm3/ssv-goerli-bot
+      ssv-faucet-bot
+      .k8/helm3/ssv-faucet-bot
   only:
     - main
