@@ -3,8 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: ssv-goerli-bot
-  name: ssv-goerli-bot
+    app: ssv-faucet-bot
+  name: ssv-faucet-bot
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}
@@ -12,11 +12,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: ssv-goerli-bot
+      app: ssv-faucet-bot
   template:
     metadata:
       labels:
-        app: ssv-goerli-bot
+        app: ssv-faucet-bot
     spec:
       containers:
         - name: {{ .Chart.Name }}
