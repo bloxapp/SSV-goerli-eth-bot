@@ -1,145 +1,122 @@
-require('discord-reply');
-require('dotenv').config();
-const web3 = require('web3');
-const utils = require('./utils');
-const redisStore = require('./redis');
-const Logger = require('./logger.js');
-const Discord = require('discord.js');
-const config = require('./config/config');
-const { verify } = require('./api.js');
-const goerliBot = require('./goerliBot.js');
-const {getTransactions} = require('./faucet.js');
-const bot = require('./initializers/DiscordBot');
-const queueHandler = require('./queueHandler.js');
-const walletSwitcher = require("./initializers/WalletSwitcher");
+import { ethers, utils } from 'ethers';
+import dotenv from 'dotenv';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 
+dotenv.config();
 
-let allowedValidatorsAmount;
-let channelIsOnline = true;
-
-const COMMAND_PREFIX = '+goerlieth';
-const title = 'SSV Goerli Deposit Bot';
-const adminID = [844110609142513675, 724238721028980756, 876421771400740874, 836513795194355765];
-
-const EMBEDDED_HELP_MESSAGE = new Discord.MessageEmbed().setTitle(title).setColor(config.COLORS.GRAY)
-    .addField("+goerlieth <address> <hex-data>", 'To start you need to register the **wallet address** you used to generate the **hex** and the **hex** itself.')
-    .addField("+goerlieth help", 'Help with the bot.')
-    .addField("+goerlieth mod", "Ping the admins for help if the **BOT** is malfunctioning (spamming this will result in a **BAN**)")
-
-bot.on('ready', async function () {
-    allowedValidatorsAmount = await getAmountOfValidatorsAllowed();
-    Logger.log('I am ready!');
-    queueHandler.executeQueueList();
-})
-
-bot.on('message', async (message) => {
-    try {
-        if (message.channel.id !== config.CHANNEL_ID) return
-        if (!message || !message.content || message.content.substring(0, COMMAND_PREFIX.length) !== COMMAND_PREFIX) return;
-        let text = '';
-        const args = (message.content.substring(COMMAND_PREFIX.length).split(/ |\n/)).filter(n => n)
-        const address = args[0];
-        const hexData = args[1];
-        let channel = message.channel;
-        if (address === 'clean' && adminID.includes(Number(message.author.id))) {
-            await redisStore.removeAllItems();
-            return;
+axiosRetry(axios, {
+    retries: 3,
+    retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 1000),
+    retryCondition(error) {
+        switch (error.response.status) {
+            //retry only if status is 500 or 501
+            case 500:
+            case 501:
+                return true;
+            default:
+                return false;
         }
-        if (0 >= allowedValidatorsAmount && channelIsOnline) {
-            console.log('<<<<<<<<<<<close channel>>>>>>>>>>>')
-            channelIsOnline = false;
-            const roleId = message.guild.roles.cache.filter(role => role.name === 'verified').first()?.id;
-            await channel.updateOverwrite(roleId, {SEND_MESSAGES: false, VIEW_CHANNEL: true});
-            await message.lineReply(config.MESSAGES.ERRORS.END_OF_CYCLE);
-            return;
-        }
-
-        if (address === 'start' && adminID.includes(Number(message.author.id))) {
-            const roleId = message.guild.roles.cache.filter(role => role.name === 'verified').first()?.id;
-            console.log('<<<<<<<<<<<start channel>>>>>>>>>>>')
-            allowedValidatorsAmount = await getAmountOfValidatorsAllowed();
-            await channel.updateOverwrite(roleId, {SEND_MESSAGES: true, VIEW_CHANNEL: true});
-            channelIsOnline = true;
-            return;
-        }
-
-        // check if user request other commands
-        if (address === 'help') {
-            const attachment = new Discord.MessageAttachment('./src/img.png', 'img.png');
-            EMBEDDED_HELP_MESSAGE.attachFiles(attachment).setImage('attachment://img.png');
-            EMBEDDED_HELP_MESSAGE.setDescription(config.MESSAGES.MODE.HELP(message.author.id))
-            await message.lineReply(EMBEDDED_HELP_MESSAGE);
-        }
-
-        // check user's params
-        if (address === 'mod') text = config.MESSAGES.MODE.MOD;
-        if (!address) {
-            text = config.MESSAGES.ERRORS.INVALID_NUMBER_OF_ARGUMENTS_ADDRESS(message.author.id);
-        }
-        if (!hexData && address && web3.utils.isAddress(address)) {
-            text = config.MESSAGES.ERRORS.INVALID_NUMBER_OF_ARGUMENTS_HEX;
-        }
-        if (!hexData && address && web3.utils.isHex(address)){
-            text = config.MESSAGES.ERRORS.INVALID_NUMBER_OF_ARGUMENTS_ADDRESS(message.author.id);
-        }
-
-        if (address && hexData) {
-            const isHex = web3.utils.isHexStrict(hexData);
-            const isAddress = web3.utils.isAddress(address);
-
-            if (isHex && isAddress) {
-                const withCustomChecks = !adminID.includes(Number(message.author.id));
-                console.log("DiscordID " + message.author.id + " is requesting " + 32 + " goerli eth.  Custom checks: " + false);
-                let walletIsReady = await goerliBot.checkWalletIsReady(message)
-                if (!walletIsReady) {
-                    console.log("Faucet does not have enough ETH.");
-                    if (message) {
-                        await message.lineReply(config.MESSAGES.ERRORS.FAUCET_DONT_HAVE_ETH);
-                    }
-                    return;
-                }
-                const publicKey = `0x${hexData.substring(330, 426)}`;
-                const verificationsIssues = await verify(address, publicKey, message.author.id)
-                if(verificationsIssues && !adminID.includes(Number(message.author.id))) {
-                    text = verificationsIssues;
-                } else {
-                    text = config.MESSAGES.SUCCESS.PROCESSING_TRANSACTION(message.author.id);
-                    await redisStore.addToQueue({
-                        message: message,
-                        authorId: message.author.id,
-                        username: message.author.username,
-                    }, address, hexData);
-                    allowedValidatorsAmount -= 1;
-                }
-            } else if (!isAddress) {
-                text = config.MESSAGES.ERRORS.INVALID_ADDRESS;
-            } else if (!isHex) {
-                text = config.MESSAGES.ERRORS.INVALID_HEX;
-            } else {
-                text = config.MESSAGES.ERRORS.UNKNOWN_ERROR;
-            }
-        }
-
-
-        if (text) {
-            await message.lineReply(text);
-        }
-
-    } catch (e) {
-        // Logger.log(e);
-        const embed = new Discord.MessageEmbed().setDescription(config.MESSAGES.ERRORS.CONTACT_THE_MODS).setColor(0xff1100).setTimestamp();
-        await message.lineReply(embed);
+    },
+    onRetry: (retryCount, error, requestConfig) => {
+        console.log(`[FAUCET][ERROR]: error: ${error}, url ${requestConfig.url}, retry count: ${retryCount}`);
     }
 });
 
-async function getAmountOfValidatorsAllowed() {
-    const itemsInQueue = (await redisStore.getQueueItems()).length
-    const addressBalance = Number(await utils.getAddressBalance(walletSwitcher.getWalletAddress()));
-    console.log(`faucet balance: ${addressBalance}`)
-    console.log('Amount of validators able to register: ', Math.floor(addressBalance / 32 - itemsInQueue));
-    return Math.floor(addressBalance / 32 - itemsInQueue);
+import { getContractToken, NETWORK_ABI } from './envHelper.js';
+const {  SSV_EXPLORER_URL, SINGER_PRIVATE_KEY, SIGNER_OWNER_ADDRESS } = process.env;
+
+const faucetApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet/`;
+const faucetConfigApiUrl = `${SSV_EXPLORER_URL}/api/ssv_faucet_config/`;
+
+const runFaucetBot = async () => {
+    console.log('[FAUCET][INFO] Start fetching initiated transactions from Explorer Center')
+    try {
+        let response = (await axios.get(faucetApiUrl + '?status=initiated')).data;
+        if (!response) {
+            console.log('[FAUCET][ERROR]: no data returned from ExplorerCenter');
+        } else if (response?.length === 0) {
+            console.log(`[FAUCET][INFO] No transaction to execute... starting over in 2 seconds`);
+        } else {
+            for (let index = 0; index < response.length; index++) {
+                const { network } = response[index];
+                const networkData = getContractToken(network);
+                const provider = new ethers.providers.JsonRpcProvider(networkData.infura);
+                const wallet = new ethers.Wallet(SINGER_PRIVATE_KEY, provider);
+                const tokenContract = new ethers.Contract(networkData.tokenAddress, NETWORK_ABI[network], wallet);
+
+                const faucetConfig = await getFaucetConfig(network);
+                if (!faucetConfig) {
+                    console.error('[FAUCET][ERROR] failed to get faucet config')
+                    continue;
+                }
+                console.log(`[FAUCET][INFO] faucet config: ${JSON.stringify(faucetConfig)}`);
+
+                const faucetBalance = utils.formatEther(await tokenContract.balanceOf(SIGNER_OWNER_ADDRESS));
+                console.log(`[FAUCET][INFO] faucet balance: ${faucetBalance}`);
+                const transactionsCapacity = Math.floor(faucetBalance / faucetConfig?.amount_to_transfer) - 1;
+                console.log(`[FAUCET][INFO] transactions capacity: ${transactionsCapacity}`);
+
+                if (faucetConfig && faucetConfig.transactions_capacity !== transactionsCapacity) {
+                    console.log(`[FAUCET][INFO] update faucet config: ${transactionsCapacity}`);
+                    await updateFaucetConfig(faucetConfig, transactionsCapacity)
+                }
+                const userTransaction = response[index];
+                if (!ethers.utils.isAddress(userTransaction.owner_address)) {
+                    await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, 'wrong owner_address', 'success')
+                    continue;
+                }
+
+                try {
+                    console.log(`[FAUCET][INFO] Sending transaction for ${userTransaction.owner_address}`)
+                    const tx = await tokenContract.transfer(userTransaction.owner_address, faucetConfig.amount_to_transfer);
+                    await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, tx.hash, 'pending');
+                    await tx.wait();
+                    console.log(`[FAUCET][INFO] Transaction for ${userTransaction.owner_address} finished with success`)
+                    await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'success')
+                } catch (error) {
+                    console.log(`[FAUCET][INFO] Transaction for ${userTransaction.owner_address} finished with failure ${error.message}`)
+                    await updateExplorerTransaction(userTransaction.id, userTransaction.owner_address, undefined, 'initiated')
+                }
+            }
+        }
+        setTimeout(getTransactions, 2000);
+    } catch (e) {
+        console.log(`[FAUCET][ERROR]: ${e}`);
+        console.log(`[FAUCET][ERROR]: ${e.message}`);
+        console.log(`[FAUCET][ERROR]: Start fetching again....`);
+        setTimeout(getTransactions, 2000);
+    }
 }
 
-console.log('<<<<<<ssv-goerli-bot started>>>>>>');
-getTransactions();
-bot.login(process.env.SSV_DISCORD_BOT_TOKEN);
+const getFaucetConfig = async (network) => {
+    let response = (await axios.get(faucetConfigApiUrl)).data.filter(config => config.network === network);
+    if(response && response.length > 0) {
+        return response[response.length - 1];
+    } else {
+        return null;
+    }
+}
+
+const updateFaucetConfig = async (config, transactionsCapacity) => {
+    (await axios.put(faucetConfigApiUrl + `${config.id}/`,{amount_to_transfer: config.amount_to_transfer, transactions_capacity: transactionsCapacity})).data;
+}
+
+const updateExplorerTransaction = async (transactionId, ownerAddress, txHash, status) => {
+    const data = { owner_address: ownerAddress };
+    if (status) {
+        data.status = status;
+    }
+    if (txHash) {
+        data.tx_hash = txHash;
+    }
+    try {
+        await axios.put(faucetApiUrl + transactionId + "/", data);
+    } catch (error) {
+        console.log(`[FAUCET][ERROR]: ${error.message}`);
+    }
+};
+
+console.log('<<<<<<ssv-faucet-bot started>>>>>>');
+
+runFaucetBot();
