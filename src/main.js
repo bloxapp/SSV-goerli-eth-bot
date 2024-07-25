@@ -80,12 +80,12 @@ const runFaucetBot = async () => {
                 }
             }
         }
-        setTimeout(getTransactions, 2000);
+        setTimeout(runFaucetBot, 2000);
     } catch (e) {
         console.log(`[FAUCET][ERROR]: ${e}`);
         console.log(`[FAUCET][ERROR]: ${e.message}`);
         console.log(`[FAUCET][ERROR]: Start fetching again....`);
-        setTimeout(getTransactions, 2000);
+        setTimeout(runFaucetBot, 2000);
     }
 }
 
